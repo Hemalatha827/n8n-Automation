@@ -1,0 +1,400 @@
+{
+  "name": "Linkedin Post Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -832,
+        -288
+      ],
+      "id": "902d446e-7358-4647-b611-fd9e6f815f6c",
+      "name": "Telegram Trigger",
+      "webhookId": "688a14f5-6043-4ba3-9468-7dfb9a901438",
+      "credentials": {
+        "telegramApi": {
+          "id": "e6VpQu7TGvZBGoKj",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "6179d00c-87f9-494f-b42a-61b7a7c34b9e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a05acf78-a3b7-472a-b8c2-e788d903de9e",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice Message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -624,
+        -288
+      ],
+      "id": "c65acafb-4bba-4513-a010-9a15f6f205c3",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -592,
+        -80
+      ],
+      "id": "c2a21dfb-2457-4307-8dcc-3190fe798f2f",
+      "name": "Get a file",
+      "webhookId": "f9f744ab-6cc9-4475-80e1-4ef8e9ebc69c",
+      "credentials": {
+        "telegramApi": {
+          "id": "e6VpQu7TGvZBGoKj",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -80
+      ],
+      "id": "a4c1378a-3fbb-44c8-ac6a-e4cbbe4dac8f",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "yI8sObBu6IW61zRo",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68cab8cc-7e7c-4e94-8754-60014022baf5",
+              "name": "message",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "71948d32-15bd-477c-bc2b-e8807c5991f9",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        -304
+      ],
+      "id": "4e93b58c-8f15-48d7-8b92-6a40424e15fa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic: {{ $json.message}}",
+        "options": {
+          "systemMessage": "=You are a research-focused AI agent.\n\nYour task is to:\n1. Analyze the user's input and clearly identify the research intent.\n2. Determine what information needs to be researched (facts, trends, comparisons, explanations, data, or summaries).\n3. Search for reliable and up-to-date sources when needed.\n4. Extract the most relevant, accurate, and concise information.\n5. Organize the findings in a clear and structured format.\n6. Adapt the depth and complexity of the response based on the user's request.\n\nResearch Rules:\n- Prioritize authoritative and trustworthy sources.\n- Avoid speculation or unsupported claims.\n- If information is uncertain or unavailable, clearly state that.\n- Summarize findings in simple, understandable language unless the user requests technical depth.\n\nOutput Format:\n- Title\n- Brief Summary\n- Key Findings (bulleted)\n- Important Details or Data\n- Sources (if available or requested)\n\nAlways focus on accuracy, clarity, and relevance to the user's input."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -224,
+        -304
+      ],
+      "id": "43c2b70f-3398-4d51-9210-971bbc87cc50",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        -128
+      ],
+      "id": "339fd5d5-d81c-4736-887c-5ed61e520317",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "yI8sObBu6IW61zRo",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic: {{ $('Telegram Trigger').item.json.message.text }}\n\nResearch: {{ $json.output }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a professional LinkedIn content writer.  \n\nYour task is to create a high-quality LinkedIn post using: \n1. The user's input (topic, goal, audience, tone, or any preferences) \n2. The researched information provided \n\n Instructions: \n- Combine research insights with the user's intent. \n- Write in a clear, engaging, and professional LinkedIn style. \n- Start with a strong hook in the first 1–2 lines.\n - Keep paragraphs short and skimmable.\n - Highlight key insights, data points, or takeaways from the research. \n- Maintain a natural, human tone (not salesy unless requested). \n- End with a thoughtful call-to-action (question, insight, or reflection). \n- Use emojis sparingly and appropriately. \n- Avoid hashtags unless the user explicitly requests them.  \n\nTone Guidelines: \n- Default tone: professional, insightful, and approachable \n- Adjust tone if the user specifies (e.g., casual, authoritative, inspirational)  \n\nOutput Requirements:\n - Return only the LinkedIn post content. - Do not include explanations, metadata, or formatting notes."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.8,
+      "position": [
+        64,
+        -304
+      ],
+      "id": "69968808-8a14-4c7e-abf7-39fb3472c8f8",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        -160
+      ],
+      "id": "f72a1685-04c5-4a46-8fd4-868762b7b13b",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "yI8sObBu6IW61zRo",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "vPXsqmPuvA",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -304
+      ],
+      "id": "ab83e68a-d221-4ee6-98c0-73181aba58c1",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "84YP9sUkxXkkkeFf",
+          "name": "LinkedIn account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "65d4d1d2-163d-4de8-b517-0897ae2025f7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eef9f61893d119c9fd883060daa26cf8c139fd0b08a63ae67440ba1484780954"
+  },
+  "id": "0zfIyVqze9Tz4Kfi",
+  "tags": []
+}
