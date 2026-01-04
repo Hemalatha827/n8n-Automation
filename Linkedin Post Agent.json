@@ -11,8 +11,8 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -832,
-        -288
+        -768,
+        -304
       ],
       "id": "902d446e-7358-4647-b611-fd9e6f815f6c",
       "name": "Telegram Trigger",
@@ -21,116 +21,6 @@
         "telegramApi": {
           "id": "e6VpQu7TGvZBGoKj",
           "name": "Telegram account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.message.text }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "exists",
-                      "singleValue": true
-                    },
-                    "id": "6179d00c-87f9-494f-b42a-61b7a7c34b9e"
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Text message"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "a05acf78-a3b7-472a-b8c2-e788d903de9e",
-                    "leftValue": "={{ $json.message.voice.file_id }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "exists",
-                      "singleValue": true
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Voice Message"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        -624,
-        -288
-      ],
-      "id": "c65acafb-4bba-4513-a010-9a15f6f205c3",
-      "name": "Switch"
-    },
-    {
-      "parameters": {
-        "resource": "file",
-        "fileId": "={{ $json.message.voice.file_id }}",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        -592,
-        -80
-      ],
-      "id": "c2a21dfb-2457-4307-8dcc-3190fe798f2f",
-      "name": "Get a file",
-      "webhookId": "f9f744ab-6cc9-4475-80e1-4ef8e9ebc69c",
-      "credentials": {
-        "telegramApi": {
-          "id": "e6VpQu7TGvZBGoKj",
-          "name": "Telegram account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "audio",
-        "operation": "transcribe",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2.1,
-      "position": [
-        -432,
-        -80
-      ],
-      "id": "a4c1378a-3fbb-44c8-ac6a-e4cbbe4dac8f",
-      "name": "Transcribe a recording",
-      "credentials": {
-        "openAiApi": {
-          "id": "yI8sObBu6IW61zRo",
-          "name": "OpenAi account"
         }
       }
     },
@@ -157,7 +47,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -416,
+        -544,
         -304
       ],
       "id": "4e93b58c-8f15-48d7-8b92-6a40424e15fa",
@@ -168,13 +58,13 @@
         "promptType": "define",
         "text": "=Topic: {{ $json.message}}",
         "options": {
-          "systemMessage": "=You are a research-focused AI agent.\n\nYour task is to:\n1. Analyze the user's input and clearly identify the research intent.\n2. Determine what information needs to be researched (facts, trends, comparisons, explanations, data, or summaries).\n3. Search for reliable and up-to-date sources when needed.\n4. Extract the most relevant, accurate, and concise information.\n5. Organize the findings in a clear and structured format.\n6. Adapt the depth and complexity of the response based on the user's request.\n\nResearch Rules:\n- Prioritize authoritative and trustworthy sources.\n- Avoid speculation or unsupported claims.\n- If information is uncertain or unavailable, clearly state that.\n- Summarize findings in simple, understandable language unless the user requests technical depth.\n\nOutput Format:\n- Title\n- Brief Summary\n- Key Findings (bulleted)\n- Important Details or Data\n- Sources (if available or requested)\n\nAlways focus on accuracy, clarity, and relevance to the user's input."
+          "systemMessage": "=You are a research-focused AI agent.\n\nYour task is to:\n\nAnalyze the user’s input and clearly identify the research intent.\n\nDetermine what needs to be researched (facts, trends, comparisons, statistics, explanations, or summaries).\n\nResearch accurate, up-to-date information (latest available through 2026) using reliable and authoritative sources.\n\nExtract only the most relevant, verified, and high-impact insights.\n\nOrganize findings in a clear, logical, and easy-to-scan structure.\n\nAdjust the depth and complexity of the response based on the user’s request (high-level vs. detailed).\n\nResearch Rules:\n\nPrioritize credible and authoritative sources (industry reports, government data, well-known research firms, reputable publications).\n\nAvoid speculation, assumptions, or unsupported claims.\n\nClearly note if information is uncertain, evolving, or not publicly available.\n\nUse simple, clear language unless the user requests technical depth.\n\nFocus on accuracy, relevance, and timeliness (2026 context).\n\nOutput Format:\n\nTitle\n\nBrief Summary\n\nKey Findings (bullet points)\n\nImportant Details or Data\n\nSources (if available or requested)\n\nAlways prioritize accuracy, clarity, and relevance to the user’s research goal."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -224,
+        -352,
         -304
       ],
       "id": "43c2b70f-3398-4d51-9210-971bbc87cc50",
@@ -194,7 +84,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        -240,
+        -416,
         -128
       ],
       "id": "339fd5d5-d81c-4736-887c-5ed61e520317",
@@ -213,7 +103,7 @@
         "messages": {
           "messageValues": [
             {
-              "message": "You are a professional LinkedIn content writer.  \n\nYour task is to create a high-quality LinkedIn post using: \n1. The user's input (topic, goal, audience, tone, or any preferences) \n2. The researched information provided \n\n Instructions: \n- Combine research insights with the user's intent. \n- Write in a clear, engaging, and professional LinkedIn style. \n- Start with a strong hook in the first 1–2 lines.\n - Keep paragraphs short and skimmable.\n - Highlight key insights, data points, or takeaways from the research. \n- Maintain a natural, human tone (not salesy unless requested). \n- End with a thoughtful call-to-action (question, insight, or reflection). \n- Use emojis sparingly and appropriately. \n- Avoid hashtags unless the user explicitly requests them.  \n\nTone Guidelines: \n- Default tone: professional, insightful, and approachable \n- Adjust tone if the user specifies (e.g., casual, authoritative, inspirational)  \n\nOutput Requirements:\n - Return only the LinkedIn post content. - Do not include explanations, metadata, or formatting notes."
+              "message": "You are a professional LinkedIn content writer.\n\nYour task is to write a short, highly readable LinkedIn post based on the user’s input and research.\n\nWriting Rules:\n\nStart with a strong hook (1–2 lines)\n\nKeep the post concise and scannable\n\nUse plain text bullet points (NO bold formatting)\n\nAdd clear spacing between each bullet point\n\nKeep emojis minimal and functional\n\nAvoid long paragraphs and avoid clutter\n\nSound natural and human-written, not promotional\n\nContent Focus:\n\nHighlight only key tools, insights, or data\n\nInclude one credible data point if provided\n\nAvoid over-explaining each bullet\n\nEnding:\n\nClose with a thoughtful engagement question\n\nOutput Rules:\n\nReturn only the LinkedIn post content\n\nDo not include explanations, formatting notes, or commentary"
             }
           ]
         },
@@ -222,7 +112,7 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.8,
       "position": [
-        64,
+        -48,
         -304
       ],
       "id": "69968808-8a14-4c7e-abf7-39fb3472c8f8",
@@ -242,8 +132,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        32,
-        -160
+        -112,
+        -144
       ],
       "id": "f72a1685-04c5-4a46-8fd4-868762b7b13b",
       "name": "OpenAI Chat Model1",
@@ -263,7 +153,7 @@
       "type": "n8n-nodes-base.linkedIn",
       "typeVersion": 1,
       "position": [
-        352,
+        240,
         -304
       ],
       "id": "ab83e68a-d221-4ee6-98c0-73181aba58c1",
@@ -282,36 +172,7 @@
       "main": [
         [
           {
-            "node": "Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch": {
-      "main": [
-        [
-          {
             "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get a file",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a file": {
-      "main": [
-        [
-          {
-            "node": "Transcribe a recording",
             "type": "main",
             "index": 0
           }
@@ -362,17 +223,6 @@
         ]
       ]
     },
-    "Transcribe a recording": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Basic LLM Chain": {
       "main": [
         [
@@ -385,12 +235,12 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "65d4d1d2-163d-4de8-b517-0897ae2025f7",
+  "versionId": "00c413cb-d34c-4061-beee-5e7858bd565b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "eef9f61893d119c9fd883060daa26cf8c139fd0b08a63ae67440ba1484780954"
